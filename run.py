@@ -42,27 +42,6 @@ def maint_jobs(directory):
     return out
 
 
-def run_and_log(job_module, job_name, merge_job, update_job, debug, test):
-    if test is True:
-        logger.info("Test mode.  Queries not executed.")
-        return
-    if update_job is True:
-        func = getattr(job_module, 'add_remove')
-        add, remove = func()
-        #Do the add and remove
-        primitive_edit(
-            add,
-            remove,
-            job_name,
-            debug_mode=debug
-        )
-    elif merge_job is True:
-        job_func = getattr(job_module, 'merge')
-        merge = job_func()
-    else:
-        raise Exception("Job type must be merge or update.")
-
-
 def run_job_list(jobs, debug):
     for maint_job in jobs:
         logger.info("Running queries for {}.".format(maint_job))
