@@ -1,6 +1,7 @@
 """
 Run our maintenance queries.
 """
+
 #Logger
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -23,10 +24,13 @@ def get_env(name):
     return value
 
 
-#Set a default path for maintenance jobs.
 def maint_jobs(directory):
     """
     Collect the jobs in the jobs dir.
+
+    to do:
+        - setup log dir within the maintq directory
+        - add python logging file there
     """
     ext = '.py'
     out = []
@@ -50,6 +54,7 @@ def run_job_list(jobs, debug):
         add, remove = func()
         backend.post_updates(add, remove, debug=debug)
 
+
 @click.command()
 @click.option('--directory', default=None, help='Directory containing jobs to run.')
 @click.option('--debug', default=False, is_flag=True, help="Debug mode.  Runs jobs but doesn't update data.")
@@ -66,9 +71,6 @@ def main(directory, debug):
 
     vmjs = maint_jobs(directory)
     run_job_list(vmjs, debug)
-
-
-
 
 
 if __name__ == "__main__":

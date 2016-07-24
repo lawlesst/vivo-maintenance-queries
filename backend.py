@@ -1,3 +1,7 @@
+"""
+Connection to the VIVO store for read and write.
+"""
+
 import logging
 logger = logging.getLogger('vmaintq')
 
@@ -7,19 +11,20 @@ from vstore import VIVOUpdateStore
 
 DEFAULT_GRAPH = "http://vitro.mannlib.cornell.edu/default/vitro-kb-2"
 
+#Define the VIVO store
+query_endpoint = os.environ['VIVO_URL'] + '/api/sparqlQuery'
+update_endpoint = os.environ['VIVO_URL'] + '/api/sparqlUpdate'
+vstore = VIVOUpdateStore(
+            os.environ['VIVO_EMAIL'],
+            os.environ['VIVO_PASSWORD']
+        )
+vstore.open((query_endpoint, update_endpoint))
+
+
 def post_updates(addg, removeg, debug=False, named_graph=DEFAULT_GRAPH):
     """
     Function for posting the data.
     """
-
-    #Define the VIVO store
-    query_endpoint = os.environ['VIVO_URL'] + '/api/sparqlQuery'
-    update_endpoint = os.environ['VIVO_URL'] + '/api/sparqlUpdate'
-    vstore = VIVOUpdateStore(
-                os.environ['VIVO_EMAIL'],
-                os.environ['VIVO_PASSWORD']
-            )
-    vstore.open((query_endpoint, update_endpoint))
 
     num_additions = len(addg)
     num_remove = len(removeg)
