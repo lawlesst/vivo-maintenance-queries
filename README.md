@@ -1,9 +1,8 @@
 ### VIVO maintenance queries
 
-This repository contains code for a presentation at the 2016 VIVO conference.
+This repository contains code for a presentation at the 2016 [VIVO](http://vivoweb.org) conference.
 
-#####Maintenance Queries, Automating the Identification and Resolution of
-Problematic Data in VIVO
+#####Maintenance Queries, Automating the Identification and Resolution of Problematic Data in VIVO
 
 Presenters: Steven McCauley and Ted Lawless
 
