@@ -1,2 +1,4 @@
 .env
 *pyc
+example/log/*
+!.gitkeep

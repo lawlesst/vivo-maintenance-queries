@@ -1,17 +1,27 @@
 """
 Run our maintenance queries.
 """
+import sys
 
 #Logger
 import logging
-logging.basicConfig(level=logging.DEBUG)
+import logging.handlers
+
 logger = logging.getLogger('vmaintq')
 logger.setLevel(logging.DEBUG)
 
+LOG_FORMAT = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+# log to console by default
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setFormatter(LOG_FORMAT)
+console_handler.setLevel(logging.DEBUG)
+logger.addHandler(console_handler)
+
+import datetime
 import glob
 import importlib
 import os
-import sys
 
 import click
 
@@ -24,13 +34,47 @@ def get_env(name):
     return value
 
 
+def setup_logger(directory, log_level=logging.INFO):
+    """
+    Create a log sub-dir inside of the maintenance directory.
+    """
+    log_name = 'vmaintq.log'
+    log_dir = os.path.join(directory, 'log')
+    if not os.path.exists(log_dir):
+        os.mkdir(log_dir)
+    # setup the logger
+    handler = logging.handlers.RotatingFileHandler(
+        os.path.join(log_dir, log_name),
+        maxBytes=10*1024*1024,
+        backupCount=5
+    )
+    handler.setFormatter(LOG_FORMAT)
+    handler.setLevel(log_level)
+    logger.addHandler(handler)
+    return log_dir
+
+
+def get_timestamp():
+    dt = datetime.datetime.now()
+    return dt.strftime("%Y-%m%d-%H%M%S")
+
+
+def save_add_remove(log_dir, name, add, remove):
+    """
+    Log the triples added and removed.
+    """
+    tstamp = get_timestamp()
+    add_file = os.path.join(log_dir, "{}_add_{}.ttl".format(name, tstamp))
+    remove_file = os.path.join(log_dir, "{}_remove_{}.ttl".format(name, tstamp))
+    # write to disk
+    add.serialize(destination=add_file, format="turtle")
+    remove.serialize(destination=remove_file, format="turtle")
+    return add_file, remove_file
+
+
 def maint_jobs(directory):
     """
     Collect the jobs in the jobs dir.
-
-    to do:
-        - setup log dir within the maintq directory
-        - add python logging file there
     """
     ext = '.py'
     out = []
@@ -46,12 +90,13 @@ def maint_jobs(directory):
     return out
 
 
-def run_job_list(jobs, debug):
+def run_job_list(jobs, debug, log_dir):
     for maint_job in jobs:
         logger.info("Running queries for {}.".format(maint_job))
         job_module = importlib.import_module('{}'.format(maint_job))
         func = getattr(job_module, 'maintq')
         add, remove = func()
+        save_add_remove(log_dir, maint_job, add, remove)
         backend.post_updates(add, remove, debug=debug)
 
 
@@ -61,16 +106,17 @@ def run_job_list(jobs, debug):
 def main(directory, debug):
     logger.info("Running maintenance queries.")
     vurl = get_env('VIVO_URL')
+    if (directory is None) or (directory == ""):
+        raise Exception("Must specify a directory with maintenance queries.")
+
     if (debug is True):
         logger.info("Debug mode. No data will be written to {}.".format(vurl))
     else:
         logger.info("Live mode. Data will be written to {}.".format(vurl))
 
-    if (directory is None):
-        raise Exception("Must specify a directory with maintenance queries.")
-
+    log_path = setup_logger(directory)
     vmjs = maint_jobs(directory)
-    run_job_list(vmjs, debug)
+    run_job_list(vmjs, debug, log_path)
 
 
 if __name__ == "__main__":
