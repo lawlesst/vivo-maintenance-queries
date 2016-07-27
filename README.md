@@ -20,7 +20,7 @@ You will also need a running version of [VIVO](http://vivoweb.org) and credentia
 #### Configuration
 
 Several environment variables are required to configure the tool to communicate
-with your running VIVO instance.
+with your running VIVO instance. To set these, copy `.sample-env` to `.env` and adjust the values to match your VIVO instance. Then run `source .env`.
 
 #### Usage
 
