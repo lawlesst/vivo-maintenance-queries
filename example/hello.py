@@ -9,6 +9,7 @@ D = Namespace(os.environ['DATA_NAMESPACE'])
 
 
 def maintq():
+    logger.info("Log message from inside the job.")
     addg = Graph()
     removeg = Graph()
     pers = D['jsmith123']

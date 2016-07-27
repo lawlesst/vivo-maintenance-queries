@@ -1,2 +1,2 @@
 click
-git+https://github.com/lawlesst/vivo-rdflib-sparqlstore.git
+vivo-rdflib-sparqlstore>=0.11
