@@ -2,6 +2,14 @@
 Run our maintenance queries.
 """
 import sys
+import datetime
+import glob
+import importlib
+import os
+
+import click
+
+import backend
 
 #Logger
 import logging
@@ -11,6 +19,9 @@ logger = logging.getLogger('vmaintq')
 logger.setLevel(logging.DEBUG)
 
 LOG_FORMAT = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+LOG_FILE_SIZE = 10*1024*1024
+LOG_BACKUP_COUNT = 5
+LOG_NAME = 'vmaintq.log'
 
 # log to console by default
 console_handler = logging.StreamHandler(sys.stdout)
@@ -18,14 +29,6 @@ console_handler.setFormatter(LOG_FORMAT)
 console_handler.setLevel(logging.DEBUG)
 logger.addHandler(console_handler)
 
-import datetime
-import glob
-import importlib
-import os
-
-import click
-
-import backend
 
 def get_env(name):
     value = os.environ.get(name)
@@ -38,20 +41,28 @@ def setup_logger(directory, log_level=logging.INFO):
     """
     Create a log sub-dir inside of the maintenance directory.
     """
-    log_name = 'vmaintq.log'
+    log_name = LOG_NAME
     log_dir = os.path.join(directory, 'log')
     if not os.path.exists(log_dir):
         os.mkdir(log_dir)
     # setup the logger
     handler = logging.handlers.RotatingFileHandler(
         os.path.join(log_dir, log_name),
-        maxBytes=10*1024*1024,
-        backupCount=5
+        maxBytes=LOG_FILE_SIZE,
+        backupCount=LOG_BACKUP_COUNT,
     )
     handler.setFormatter(LOG_FORMAT)
     handler.setLevel(log_level)
     logger.addHandler(handler)
     return log_dir
+
+
+def rdf_log_path(directory, job_name):
+    # Create a sub-directory for this job
+    rdf_log_dir = os.path.join(directory, job_name)
+    if not os.path.exists(rdf_log_dir):
+        os.mkdir(rdf_log_dir)
+    return rdf_log_dir
 
 
 def get_timestamp():
@@ -63,10 +74,12 @@ def save_add_remove(log_dir, name, add, remove):
     """
     Log the triples added and removed.
     """
+    # Create a sub-directory for this job
+    rdf_log = rdf_log_path(log_dir, name)
     tstamp = get_timestamp()
-    add_file = os.path.join(log_dir, "{}_add_{}.ttl".format(name, tstamp))
-    remove_file = os.path.join(log_dir, "{}_remove_{}.ttl".format(name, tstamp))
-    # write to disk
+    add_file = os.path.join(rdf_log, "{}_add_{}.ttl".format(name, tstamp))
+    remove_file = os.path.join(rdf_log, "{}_remove_{}.ttl".format(name, tstamp))
+    # Save to file
     add.serialize(destination=add_file, format="turtle")
     remove.serialize(destination=remove_file, format="turtle")
     return add_file, remove_file
@@ -79,10 +92,10 @@ def maint_jobs(directory):
     ext = '.py'
     out = []
     target_dir = directory
-    #Add the target directory to the Python path.
+    # Add the target directory to the Python path.
     sys.path.append(target_dir)
     for mj in glob.glob(target_dir + '/*' + ext):
-        #skip init files
+        # Skip init files
         if mj.find('__init') > -1:
             continue
         fn = os.path.split(mj)[-1].rstrip(ext)
