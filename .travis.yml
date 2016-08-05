@@ -1,4 +1,9 @@
 language: python
+env:
+    DATA_NAMESPACE="http://vivo.school.edu/individual/"
+    VIVO_URL="http://localhost/vivo"
+    VIVO_EMAIL="xxx"
+    VIVO_PASSWORD="xxx"
 python:
   - "2.7"
 install:
