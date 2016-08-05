@@ -31,7 +31,7 @@ def get_unlinked():
 
 
 def maintq():
-    logger.info("Log message from inside the job.")
+    logger.info("Checking for unlinked research areas.")
     # Additions
     addg = Graph()
     # Removal
