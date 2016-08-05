@@ -1,18 +1,17 @@
-import os
+"""
+Minimum required to implement a maintenance query.
+"""
+
 import logging
 logger = logging.getLogger('vmaintq')
 
-from rdflib import Graph, Namespace, Literal
-from rdflib.namespace import RDF, RDFS, FOAF
-
-D = Namespace(os.environ['DATA_NAMESPACE'])
+from rdflib import Graph
 
 
 def maintq():
     logger.info("Log message from inside the job.")
+    # Additions
     addg = Graph()
+    # Removal
     removeg = Graph()
-    pers = D['jsmith123']
-    removeg.add((pers, RDF.type, FOAF.Person))
-    removeg.add((pers, RDFS.label, Literal("Smith, Jill")))
-    return (addg, removeg)
+    return addg, removeg

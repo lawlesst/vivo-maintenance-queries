@@ -4,7 +4,9 @@ from unittest import TestCase
 
 from vmaintq import run
 
-JOBS_DIR = os.path.join('..', 'example')
+DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
+JOBS_DIR = os.path.join(DIR, 'example')
 
 
 class TestSetup(TestCase):
