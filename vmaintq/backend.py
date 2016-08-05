@@ -1,13 +1,13 @@
 """
 Connection to the VIVO store for read and write.
 """
-
+import os
 import logging
 logger = logging.getLogger('vmaintq')
 
-import os
 
 from vstore import VIVOUpdateStore
+
 
 DEFAULT_GRAPH = "http://vitro.mannlib.cornell.edu/default/vitro-kb-2"
 
@@ -21,7 +21,7 @@ vstore = VIVOUpdateStore(
 vstore.open((query_endpoint, update_endpoint))
 
 
-def post_updates(addg, removeg, debug=False, named_graph=DEFAULT_GRAPH):
+def post_updates(addg, removeg, debug=False, named_graph=DEFAULT_GRAPH, vstore=vstore):
     """
     Function for posting the data.
     """
@@ -46,3 +46,5 @@ def post_updates(addg, removeg, debug=False, named_graph=DEFAULT_GRAPH):
                 vstore.bulk_remove(named_graph, removeg)
 
     return True
+
+

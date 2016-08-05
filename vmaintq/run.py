@@ -103,11 +103,15 @@ def maint_jobs(directory):
     return out
 
 
+def import_job(maint_job):
+    job_module = importlib.import_module('{}'.format(maint_job))
+    return getattr(job_module, 'maintq')
+
+
 def run_job_list(jobs, debug, log_dir):
     for maint_job in jobs:
         logger.info("Running queries for {}.".format(maint_job))
-        job_module = importlib.import_module('{}'.format(maint_job))
-        func = getattr(job_module, 'maintq')
+        func = import_job(maint_job)
         add, remove = func()
         save_add_remove(log_dir, maint_job, add, remove)
         backend.post_updates(add, remove, debug=debug)
