@@ -80,8 +80,10 @@ def save_add_remove(log_dir, name, add, remove):
     add_file = os.path.join(rdf_log, "{}_add_{}.ttl".format(name, tstamp))
     remove_file = os.path.join(rdf_log, "{}_remove_{}.ttl".format(name, tstamp))
     # Save to file
-    add.serialize(destination=add_file, format="turtle")
-    remove.serialize(destination=remove_file, format="turtle")
+    if len(add) > 0:
+        add.serialize(destination=add_file, format="turtle")
+    if len(remove) > 0:
+        remove.serialize(destination=remove_file, format="turtle")
     return add_file, remove_file
 
 
