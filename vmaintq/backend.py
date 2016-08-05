@@ -3,11 +3,13 @@ Connection to the VIVO store for read and write.
 """
 import os
 import logging
-logger = logging.getLogger('vmaintq')
 
+from rdflib import Graph
+from rdflib.query import ResultException
 
 from vstore import VIVOUpdateStore
 
+logger = logging.getLogger('vmaintq')
 
 DEFAULT_GRAPH = "http://vitro.mannlib.cornell.edu/default/vitro-kb-2"
 
@@ -48,3 +50,14 @@ def post_updates(addg, removeg, debug=False, named_graph=DEFAULT_GRAPH, vstore=v
     return True
 
 
+def do_construct(rq):
+    """
+    Helper for running construct queries.
+    :param rq:
+    :return: Graph
+    """
+    try:
+        rsp = vstore.query(rq)
+        return rsp.graph
+    except ResultException:
+        return Graph()

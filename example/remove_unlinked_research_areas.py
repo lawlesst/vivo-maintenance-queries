@@ -3,11 +3,12 @@ Remove Concepts/Research Areas that don't have links to other entities.
 """
 
 import logging
-logger = logging.getLogger('vmaintq')
-
-from vmaintq import backend
 
 from rdflib import Graph
+from vmaintq import backend
+
+logger = logging.getLogger('vmaintq')
+
 
 def get_unlinked():
     rq = """
@@ -25,9 +26,7 @@ def get_unlinked():
         FILTER NOT EXISTS { ?fac vivo:hasResearchArea ?ra }
     }
     """
-    rsp = backend.vstore.query(rq)
-    if rsp.graph is not None:
-        return rsp.graph
+    return backend.do_construct(rq)
 
 
 def maintq():
