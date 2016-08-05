@@ -50,6 +50,15 @@ def post_updates(addg, removeg, debug=False, named_graph=DEFAULT_GRAPH, vstore=v
     return True
 
 
+def do_select(rq):
+    """
+    Helper for running select queries.
+    :param rq:
+    :return:
+    """
+    return vstore.query(rq)
+
+
 def do_construct(rq):
     """
     Helper for running construct queries.
