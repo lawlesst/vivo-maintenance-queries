@@ -1,5 +1,7 @@
 ### VIVO maintenance queries
 
+[![Build Status](https://travis-ci.org/lawlesst/vivo-rdflib-sparqlstore.svg?branch=master)](https://travis-ci.org/lawlesst/vivo-maintenance-queries)
+
 This repository contains code for a presentation at the 2016 [VIVO](http://vivoweb.org) conference.
 
 #####Maintenance Queries, Automating the Identification and Resolution of Problematic Data in VIVO
