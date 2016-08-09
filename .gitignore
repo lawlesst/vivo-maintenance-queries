@@ -4,3 +4,4 @@ example/log/*
 !.gitkeep
 vivo_maintenance_queries.egg-info/
 .idea/
+.DS_Store
