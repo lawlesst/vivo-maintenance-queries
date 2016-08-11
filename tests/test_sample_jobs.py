@@ -94,3 +94,43 @@ class TestDuplicateLabels(TestCase):
         self.assertEqual(len(remove), 1)
         label = remove.value(subject=URIRef("http://vivo.school.edu/individual/topic1"), predicate=RDFS.label).toPython()
         self.assertEqual(label, "Economics")
+
+
+sample3 = """
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix vivo: <http://vivoweb.org/ontology/core#> .
+@prefix d: <http://vivo.school.edu/individual/> .
+@prefix bibo: <http://purl.org/ontology/bibo/> .
+
+d:pub1 a bibo:Document ;
+    rdfs:label "Plasma Actuated Heat Transfer" ;
+    bibo:pmid "24313031" .
+
+d:pub2 a bibo:Document ;
+    rdfs:label "Reinforcer accumulation in a token-reinforcement context with pigeons." ;
+    bibo:pmid "19070337" .
+
+d:pub3 rdfs:label "Maternal voice and short-term outcomes in preterm infants" ;
+    bibo:pmid "20112262" ;
+    vivo:pmcid "PMC3650487" .
+"""
+
+
+class TestAddPMCID(TestCase):
+
+    def setUp(self):
+        g = Graph().parse(data=sample3, format="turtle")
+        store.bulk_add(DEFAULT_GRAPH, g)
+        # override backend vstore
+        backend.vstore = store
+
+    def test_remove_unlinked(self):
+        jobs = run.maint_jobs(JOBS_DIR)
+        job = run.import_job("add_pmcid")
+        add, remove = job()
+        self.assertEqual(len(add), 1)
+        self.assertEqual(len(remove), 0)
+        pmcid = add.value(subject=URIRef("http://vivo.school.edu/individual/pub2"), predicate=URIRef("http://vivoweb.org/ontology/core#pmcid"))
+        self.assertEqual(pmcid.toPython(), "PMC2582204")

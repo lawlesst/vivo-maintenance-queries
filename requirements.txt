@@ -1,2 +1,4 @@
 click
 vivo-rdflib-sparqlstore==0.2
+# only needed for sample job
+requests
